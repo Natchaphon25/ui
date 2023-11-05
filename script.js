@@ -1,24 +1,33 @@
 function handleClick(element) {
-    const end_point_url = "http://localhost/api/brandofcar";
+    // กำหนด URL ของ API endpoint
+    const end_point_url = "http://localhost/api/placeclass";
+    // ดึงข้อมูลไฟล์รูปภาพจากอิลิเมนต์ input
     const file = element.files[0];
+    // สร้าง FileReader เพื่ออ่านไฟล์รูปภาพ
     const reader = new FileReader();
 
+    // เมื่อไฟล์ถูกอ่านเสร็จสิ้น
     reader.onload = () => {
-        const base64String = reader.result;
-
+        const base64String = reader.result.split(',')[1];
+        const requestBody = {
+            image: base64String
+        };
+        // ส่งข้อมูลไปยัง API endpoint โดยใช้ fetch API
         fetch(end_point_url, {
             method: "POST",
-            body: JSON.stringify({ image_str: base64String }),
+            body: JSON.stringify(requestBody),
             headers: { "Content-type": "application/json; charset=UTF-8" }
         })
         .then(response => response.json())
         .then(json => {
+             // แสดงผลลัพธ์ที่ได้จาก API ลงบนหน้าเว็บ
             const resultElement = document.getElementById('result');
-            const carModel = json["Brand of this car is"];
-            resultElement.textContent = `ยี่ห้อรถยนต์: ${carModel}`;
-
+            const placeModel = json["this picture is"];
+            resultElement.textContent = `ลักษณะสถานที่: ${placeModel}`;
+            
+            // แสดงรูปภาพที่เลือกลงบนหน้าเว็บ
             const previewImageElement = document.getElementById('previewImage');
-            previewImageElement.src = base64String;
+            previewImageElement.src = `data:image/png;base64,${base64String}`;
         });
     };
 
